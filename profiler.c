@@ -28,7 +28,7 @@ int main(int argc, char ** argv)
   int has_chosen_type = 0;
 
   int ch;
-  while ((ch = getopt(argc, argv, "n:")) != -1)
+  while ((ch = getopt(argc, argv, "n:t:")) != -1)
   {
     switch (ch)
     {

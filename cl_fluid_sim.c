@@ -32,6 +32,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
 
   fluid->global_size[0] = fluid->sim_size;
   fluid->global_size[1] = fluid->sim_size;
+  // TODO: be smarter about setting these values
   fluid->local_size[0] = 16;
   fluid->local_size[1] = 16;
   fluid->full_global_size = 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2);
@@ -52,7 +53,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   // Get Platform and Device Info
   err = clGetPlatformIDs(1, NULL, &num_available_platforms);
   check_error(err, "Unable to get the number of platform IDs");
-  fprintf(stdout, "%d platform(s) available\n", num_available_platforms);
+  //fprintf(stdout, "%d platform(s) available\n", num_available_platforms);
 
   cl_platform_id platforms[num_available_platforms];
 
@@ -64,14 +65,15 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   for (int i = 0; i < num_available_platforms; i++)
   {
     clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 100, name, NULL);
-    fprintf(stdout, "\tplatform[%i] name: %s\n", i, name);
+    //fprintf(stdout, "\tplatform[%i] name: %s\n", i, name);
   }
 
+  // TODO: Be smarter about picking a platform
   cl_platform_id fluid_platform = platforms[0];
 
   err = clGetDeviceIDs(fluid_platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_available_devices);
   check_error(err, "Unable to get the number of device IDs");
-  fprintf(stdout, "%d device(s) available\n", num_available_devices);
+  //fprintf(stdout, "%d device(s) available\n", num_available_devices);
 
   cl_device_id devices[num_available_devices];
 
@@ -81,29 +83,30 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   cl_device_id fluid_device = devices[0];
   cl_device_type device_type;
 
+  // TODO: Be smarter about picking a device
   for (int i = 0; i < num_available_devices; i++)
   {
     clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 100, name, NULL);
     clGetDeviceInfo(devices[i], CL_DEVICE_TYPE, sizeof(cl_device_type), &device_type, NULL);
-    fprintf(stdout, "\tdevice[%i] is %s", i, name);
+    //fprintf(stdout, "\tdevice[%i] is %s", i, name);
     switch (device_type)
     {
       case CL_DEVICE_TYPE_GPU:
-        fprintf(stdout, " (GPU)\n");
+        //fprintf(stdout, " (GPU)\n");
         if (flags & F_USE_GPU)
         {
           fluid_device = devices[i];
         }
         break;
       case CL_DEVICE_TYPE_CPU:
-        fprintf(stdout, " (CPU)\n");
+        //fprintf(stdout, " (CPU)\n");
         if (flags & F_USE_CPU)
         {
           fluid_device = devices[i];
         }
         break;
       default:
-        fprintf(stdout, " (?)\n");
+        //fprintf(stdout, " (?)\n");
         break;
     }
   }
@@ -114,15 +117,9 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   size_t max_work_item_size[max_work_item_dimensions];
   clGetDeviceInfo(fluid_device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t[max_work_item_dimensions]), max_work_item_size, NULL);
 
-  if (fluid->local_size[0] > max_work_item_size[0])
-  {
-    fluid->local_size[0] = max_work_item_size[0];
-  }
-  if (fluid->local_size[1] > max_work_item_size[1])
-  {
-    fluid->local_size[1] = max_work_item_size[1];
-  }
-  //fprintf(stdout, "Max work items (%d, %d)\nwork items (%d, %d)\n", max_work_item_size[0], max_work_item_size[1], fluid->local_size[0], fluid->local_size[1]);
+  fluid->local_size[0] = fmin(fluid->local_size[0], max_work_item_size[0]);
+  fluid->local_size[1] = fmin(fluid->local_size[1], max_work_item_size[1]);
+  //fprintf(stdout, "Max work items (%zu, %zu)\nwork items (%zu, %zu)\n", max_work_item_size[0], max_work_item_size[1], fluid->local_size[0], fluid->local_size[1]);
 
 
   if (fluid->is_using_opengl)
@@ -288,8 +285,9 @@ void simulate_next_frame(FluidSim * fluid, float dt)
   add_event_sources(fluid, &fluid->velocity_mem[PREV], &fluid->u_velocity_events, IS_U_VELOCITY);
   add_event_sources(fluid, &fluid->velocity_mem[PREV], &fluid->v_velocity_events, IS_V_VELOCITY);
 
-  velocity_step(fluid, dt);
-  density_step(fluid, dt);
+  float sim_dt = fmin(dt, MAX_DT);
+  velocity_step(fluid, sim_dt);
+  density_step(fluid, sim_dt);
 
   copy_to_framebuffer(fluid, &fluid->density_mem[CUR]);
 

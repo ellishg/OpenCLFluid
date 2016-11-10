@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #ifdef __APPLE__
   #include "OpenCL/opencl.h"
@@ -18,6 +19,7 @@
 #define MAX_DENSITY 1
 #define RUN_BAD_DIFFUSE 0
 #define MAX_NUM_SIMULTANEOUS_EVENTS 10
+#define MAX_DT 0.05f
 
 #define PREV 0
 #define CUR 1
