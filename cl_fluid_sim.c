@@ -46,19 +46,60 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
 
   fluid->cur_sample = 0;
 
-  cl_device_id device;
-  cl_platform_id platform;
+  cl_uint num_available_platforms = -1;
+  cl_uint num_available_devices = -1;
 
-  cl_uint num_available_platforms;
-  cl_uint num_available_devices;
   // Get Platform and Device Info
-  err = clGetPlatformIDs(1, &platform, &num_available_platforms);
-  check_error(err, "Unable to get platform IDs");
+  err = clGetPlatformIDs(1, NULL, &num_available_platforms);
+  check_error(err, "Unable to get the number of platform IDs");
   fprintf(stdout, "%d platform(s) available\n", num_available_platforms);
 
-  err = clGetDeviceIDs(platform, CL_DEVICE_TYPE_ALL, 1, &device, &num_available_devices);
-  check_error(err, "Unable to get device IDs");
+  cl_platform_id platforms[num_available_platforms];
+
+  err = clGetPlatformIDs(num_available_platforms, platforms, NULL);
+  check_error(err, "Unable to get platform IDs");
+
+  char name[100];
+
+  for (int i = 0; i < num_available_platforms; i++)
+  {
+    clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 100, name, NULL);
+    fprintf(stdout, "\tplatform[%i] name: %s\n", i, name);
+  }
+
+  cl_platform_id fluid_platform = platforms[0];
+
+  err = clGetDeviceIDs(fluid_platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_available_devices);
+  check_error(err, "Unable to get the number of device IDs");
   fprintf(stdout, "%d device(s) available\n", num_available_devices);
+
+  cl_device_id devices[num_available_devices];
+
+  err = clGetDeviceIDs(fluid_platform, CL_DEVICE_TYPE_ALL, num_available_devices, devices, NULL);
+  check_error(err, "Unable to get device IDs");
+
+  cl_device_id fluid_device = devices[0];
+  cl_device_type device_type;
+
+  for (int i = 0; i < num_available_devices; i++)
+  {
+    clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 100, name, NULL);
+    clGetDeviceInfo(devices[i], CL_DEVICE_TYPE, sizeof(cl_device_type), &device_type, NULL);
+    fprintf(stdout, "\tdevice[%i] is %s", i, name);
+    switch (device_type)
+    {
+      case CL_DEVICE_TYPE_GPU:
+        fprintf(stdout, " (GPU)\n");
+        fluid_device = devices[i];
+        break;
+      case CL_DEVICE_TYPE_CPU:
+        fprintf(stdout, " (CPU)\n");
+        break;
+      default:
+        fprintf(stdout, " (?)\n");
+        break;
+    }
+  }
 
   if (fluid->is_using_opengl)
   {
@@ -77,16 +118,16 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
     };
 #endif
     // Create OpenCL context
-    fluid->context = clCreateContext(properties, 1, &device, NULL, NULL, &err);
+    fluid->context = clCreateContext(properties, 1, &fluid_device, NULL, NULL, &err);
     check_error(err, "Unable to create cl context");
   }
   else {
-    fluid->context = clCreateContext(NULL, 1, &device, NULL, NULL, &err);
+    fluid->context = clCreateContext(NULL, 1, &fluid_device, NULL, NULL, &err);
     check_error(err, "Unable to create cl context");
   }
 
   // commands are executed in-order
-  fluid->command_queue = clCreateCommandQueue(fluid->context, device, CL_QUEUE_PROFILING_ENABLE, &err);
+  fluid->command_queue = clCreateCommandQueue(fluid->context, fluid_device, CL_QUEUE_PROFILING_ENABLE, &err);
   check_error(err, "Unable to create command queue");
 
   fluid->program = clCreateProgramWithSource(fluid->context, 1, (const char **)&kernel_src, (const size_t *)&kernel_src_size, &err);
@@ -105,11 +146,11 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
                                     "-D IS_V_VELOCITY=%d "
                                     , fluid->sim_size, fluid->stride, MAX_DENSITY, IS_DENSITY, IS_A_DENSITY, IS_B_DENSITY, IS_VELOCITY, IS_U_VELOCITY, IS_V_VELOCITY);
 
-  err = clBuildProgram(fluid->program, 1, &device, kernel_definitions, NULL, NULL);
+  err = clBuildProgram(fluid->program, 1, &fluid_device, kernel_definitions, NULL, NULL);
   free(kernel_definitions);
   const size_t max_log_length = 16384;
   char log[max_log_length];
-  clGetProgramBuildInfo(fluid->program, device, CL_PROGRAM_BUILD_LOG, max_log_length, log, NULL);
+  clGetProgramBuildInfo(fluid->program, fluid_device, CL_PROGRAM_BUILD_LOG, max_log_length, log, NULL);
   fprintf(stderr, "%s", log);
   check_error(err, "Unable to build program");
 
