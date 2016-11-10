@@ -24,7 +24,7 @@
 #define PREV 0
 #define CUR 1
 
-#define NUM_SAMPLES 10
+#define NUM_SAMPLES 5
 
 #define check_error(err, str) check_for_error(err, str, __FILE__, __LINE__)
 
