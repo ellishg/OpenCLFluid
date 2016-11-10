@@ -89,8 +89,10 @@ int main(int argc, char ** argv)
   float diffusion_rate = 0.000001;
   size_t sim_size = 256;
 
+  int has_chosen_type = 0;
+
   int ch;
-  while ((ch = getopt(argc, argv, "pv:d:n:")) != -1)
+  while ((ch = getopt(argc, argv, "pv:d:n:t:")) != -1)
   {
     switch (ch)
     {
@@ -106,9 +108,25 @@ int main(int argc, char ** argv)
       case 'n':
         sim_size = atoi(optarg);
         break;
+      case 't':
+        if (strcmp(optarg, "CPU") == 0)
+        {
+          flags |= F_USE_CPU;
+        }
+        else if (strcmp(optarg, "GPU") == 0)
+        {
+          flags |= F_USE_GPU;
+        }
+        has_chosen_type = 1;
+        break;
       default:
         break;
     }
+  }
+
+  if (!has_chosen_type)
+  { //set defualt value
+    flags |= F_USE_GPU;
   }
 
   my_window = create_window(WINDOW_WIDTH, WINDOW_HEIGHT, sim_size);

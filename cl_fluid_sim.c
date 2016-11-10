@@ -90,16 +90,40 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
     {
       case CL_DEVICE_TYPE_GPU:
         fprintf(stdout, " (GPU)\n");
-        fluid_device = devices[i];
+        if (flags & F_USE_GPU)
+        {
+          fluid_device = devices[i];
+        }
         break;
       case CL_DEVICE_TYPE_CPU:
         fprintf(stdout, " (CPU)\n");
+        if (flags & F_USE_CPU)
+        {
+          fluid_device = devices[i];
+        }
         break;
       default:
         fprintf(stdout, " (?)\n");
         break;
     }
   }
+
+  size_t max_work_item_dimensions;
+  clGetDeviceInfo(fluid_device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(size_t), &max_work_item_dimensions, NULL);
+
+  size_t max_work_item_size[max_work_item_dimensions];
+  clGetDeviceInfo(fluid_device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t[max_work_item_dimensions]), max_work_item_size, NULL);
+
+  if (fluid->local_size[0] > max_work_item_size[0])
+  {
+    fluid->local_size[0] = max_work_item_size[0];
+  }
+  if (fluid->local_size[1] > max_work_item_size[1])
+  {
+    fluid->local_size[1] = max_work_item_size[1];
+  }
+  //fprintf(stdout, "Max work items (%d, %d)\nwork items (%d, %d)\n", max_work_item_size[0], max_work_item_size[1], fluid->local_size[0], fluid->local_size[1]);
+
 
   if (fluid->is_using_opengl)
   {

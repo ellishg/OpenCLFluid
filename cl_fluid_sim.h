@@ -28,7 +28,9 @@
 
 typedef enum FLAGS
 {
-  F_PROFILE = 0b0001
+  F_PROFILE = 0b0001,
+  F_USE_CPU = 0b0010,
+  F_USE_GPU = 0b0100
 } FLAGS;
 
 typedef enum VEC_TYPE

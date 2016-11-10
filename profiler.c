@@ -25,6 +25,7 @@ int main(int argc, char ** argv)
 
   size_t sim_size = 512;
   FLAGS flags = F_PROFILE;
+  int has_chosen_type = 0;
 
   int ch;
   while ((ch = getopt(argc, argv, "n:")) != -1)
@@ -34,9 +35,25 @@ int main(int argc, char ** argv)
       case 'n':
         sim_size = atoi(optarg);
         break;
+      case 't':
+        if (strcmp(optarg, "CPU") == 0)
+        {
+          flags |= F_USE_CPU;
+        }
+        else if (strcmp(optarg, "GPU") == 0)
+        {
+          flags |= F_USE_GPU;
+        }
+        has_chosen_type = 1;
+        break;
       default:
         break;
     }
+  }
+
+  if (!has_chosen_type)
+  { //set defualt value
+    flags |= F_USE_GPU;
   }
 
   // zero is never a valid texture
