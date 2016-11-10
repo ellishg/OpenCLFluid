@@ -8,8 +8,8 @@ ifeq ($(OS), Darwin)
 	FLAGS+=-F/Library/Frameworks -framework SDL2 -framework OpenCL -framework OpenGL
 	PROFILER_FLAGS+=-F/Library/Frameworks -framework OpenCL -framework OpenGL
 else ifeq ($(OS), Linux)
-	FLAGS+=-lSDL2 -lOpenCL -lGL
-	PROFILER_FLAGS+=-lOpenCL -lGL
+	FLAGS+=-lSDL2 -lOpenCL -lGL -lm
+	PROFILER_FLAGS+=-lOpenCL -lGL -lm
 endif
 
 C_FILES=main.c cl_fluid_sim.c sdl_window.c
