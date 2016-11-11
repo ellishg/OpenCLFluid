@@ -33,8 +33,8 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   fluid->global_size[0] = fluid->sim_size;
   fluid->global_size[1] = fluid->sim_size;
   // TODO: be smarter about setting these values
-  fluid->local_size[0] = 16;
-  fluid->local_size[1] = 16;
+  fluid->local_size[0] = 512;
+  fluid->local_size[1] = 1;
   fluid->full_global_size = 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2);
   fluid->full_local_size = 8;
   fluid->set_bnd_global_size = (fluid->sim_size + 1);
@@ -53,7 +53,10 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   // Get Platform and Device Info
   err = clGetPlatformIDs(1, NULL, &num_available_platforms);
   check_error(err, "Unable to get the number of platform IDs");
-  //fprintf(stdout, "%d platform(s) available\n", num_available_platforms);
+  if (flags & F_DEBUG)
+  {
+    fprintf(stdout, "%d platform(s) available\n", num_available_platforms);
+  }
 
   cl_platform_id platforms[num_available_platforms];
 
@@ -65,7 +68,10 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   for (int i = 0; i < num_available_platforms; i++)
   {
     clGetPlatformInfo(platforms[i], CL_PLATFORM_NAME, 100, name, NULL);
-    //fprintf(stdout, "\tplatform[%i] name: %s\n", i, name);
+    if (flags & F_DEBUG)
+    {
+      fprintf(stdout, "\tplatform[%i] name: %s\n", i, name);
+    }
   }
 
   // TODO: Be smarter about picking a platform
@@ -73,14 +79,17 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
 
   err = clGetDeviceIDs(fluid_platform, CL_DEVICE_TYPE_ALL, 0, NULL, &num_available_devices);
   check_error(err, "Unable to get the number of device IDs");
-  //fprintf(stdout, "%d device(s) available\n", num_available_devices);
+  if (flags & F_DEBUG)
+  {
+    fprintf(stdout, "%d device(s) available\n", num_available_devices);
+  }
 
   cl_device_id devices[num_available_devices];
 
   err = clGetDeviceIDs(fluid_platform, CL_DEVICE_TYPE_ALL, num_available_devices, devices, NULL);
   check_error(err, "Unable to get device IDs");
 
-  cl_device_id fluid_device = devices[0];
+  cl_device_id fluid_device = -1;
   cl_device_type device_type;
 
   // TODO: Be smarter about picking a device
@@ -88,7 +97,10 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   {
     clGetDeviceInfo(devices[i], CL_DEVICE_NAME, 100, name, NULL);
     clGetDeviceInfo(devices[i], CL_DEVICE_TYPE, sizeof(cl_device_type), &device_type, NULL);
-    //fprintf(stdout, "\tdevice[%i] is %s", i, name);
+    if (flags & F_DEBUG)
+    {
+      fprintf(stdout, "\tdevice[%i] is %s\n", i, name);
+    }
     switch (device_type)
     {
       case CL_DEVICE_TYPE_GPU:
@@ -111,16 +123,23 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
     }
   }
 
+  if (fluid_device == -1)
+  {
+    check_error(-1, "Unable to find device");
+  }
+
   size_t max_work_item_dimensions;
   clGetDeviceInfo(fluid_device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(size_t), &max_work_item_dimensions, NULL);
 
   size_t max_work_item_size[max_work_item_dimensions];
   clGetDeviceInfo(fluid_device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t[max_work_item_dimensions]), max_work_item_size, NULL);
 
-  fluid->local_size[0] = fmin(fluid->local_size[0], max_work_item_size[0]);
-  fluid->local_size[1] = fmin(fluid->local_size[1], max_work_item_size[1]);
-  //fprintf(stdout, "Max work items (%zu, %zu)\nwork items (%zu, %zu)\n", max_work_item_size[0], max_work_item_size[1], fluid->local_size[0], fluid->local_size[1]);
-
+  fluid->local_size[0] = fmin(fluid->sim_size, fmin(fluid->local_size[0], max_work_item_size[0]));
+  fluid->local_size[1] = fmin(fluid->sim_size, fmin(fluid->local_size[1], max_work_item_size[1]));
+  if (flags & F_DEBUG)
+  {
+    fprintf(stdout, "Max work item size (%zu, %zu)\nlocal work size (%zu, %zu)\n", max_work_item_size[0], max_work_item_size[1], fluid->local_size[0], fluid->local_size[1]);
+  }
 
   if (fluid->is_using_opengl)
   {
@@ -603,7 +622,7 @@ float profile_event(cl_event event, size_t times_run, cl_ulong samples[NUM_SAMPL
 
   float bandwidth = n * n * 4 * entries / ms * 1000 / (1024 * 1024 * 1024);
 
-  fprintf(stdout, "%.3f ms at %.2f GB/s (ran %lu times) for %s\n", ms, bandwidth, times_run, str);
+  fprintf(stdout, "%.3f ms at %.2f GB/s (ran %lu times) for %s\n", ms * times_run, bandwidth, times_run, str);
 
   return ms * times_run;
 }

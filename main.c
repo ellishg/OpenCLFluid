@@ -92,10 +92,13 @@ int main(int argc, char ** argv)
   int has_chosen_type = 0;
 
   int ch;
-  while ((ch = getopt(argc, argv, "pv:d:n:t:")) != -1)
+  while ((ch = getopt(argc, argv, "bpv:d:n:t:")) != -1)
   {
     switch (ch)
     {
+      case 'b':
+        flags |= F_DEBUG;
+        break;
       case 'p':
         flags |= F_PROFILE;
         break;

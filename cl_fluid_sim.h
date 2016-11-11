@@ -24,7 +24,7 @@
 #define PREV 0
 #define CUR 1
 
-#define NUM_SAMPLES 5
+#define NUM_SAMPLES 10
 
 #define check_error(err, str) check_for_error(err, str, __FILE__, __LINE__)
 
@@ -32,7 +32,8 @@ typedef enum FLAGS
 {
   F_PROFILE = 0b0001,
   F_USE_CPU = 0b0010,
-  F_USE_GPU = 0b0100
+  F_USE_GPU = 0b0100,
+  F_DEBUG   = 0b1000,
 } FLAGS;
 
 typedef enum VEC_TYPE
