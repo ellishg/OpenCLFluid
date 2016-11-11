@@ -135,7 +135,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   clGetDeviceInfo(fluid_device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t[max_work_item_dimensions]), max_work_item_size, NULL);
 
   fluid->local_size[0] = fmin(fluid->sim_size, fmin(fluid->local_size[0], max_work_item_size[0]));
-  fluid->local_size[1] = fmin(fluid->sim_size, fmin(fluid->local_size[1], max_work_item_size[1] / fluid->local_size[0]));
+  fluid->local_size[1] = fmin(fluid->sim_size, fmin(fluid->local_size[1], fmax(1, max_work_item_size[1] / fluid->local_size[0])));
   if (flags & F_DEBUG)
   {
     fprintf(stdout, "Max work item size (%zu, %zu)\nlocal work size (%zu, %zu)\n", max_work_item_size[0], max_work_item_size[1], fluid->local_size[0], fluid->local_size[1]);
