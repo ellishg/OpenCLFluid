@@ -124,10 +124,11 @@ typedef struct fluid_sim_t
 
   size_t global_size[2];
   size_t local_size[2];
-  size_t full_global_size;
   size_t full_local_size;
   size_t set_bnd_global_size;
   size_t set_bnd_local_size;
+
+  size_t buffer_size;
 
   SourceEventList a_density_events;
   SourceEventList b_density_events;

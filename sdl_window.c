@@ -101,7 +101,7 @@ void render_window(window_t * window, int fps)
   SDL_GL_SwapWindow(window->sdl_window);
 }
 
-void poll_events(window_t * window, void (*on_clicked)(float x, float y, int shift_held), void (*on_release)(void))
+void poll_events(window_t * window, void (*on_clicked)(float x, float y, int shift_held), void (*toggle)(), void (*on_release)(void))
 {
   int width, height;
   SDL_Event event;
@@ -121,6 +121,9 @@ void poll_events(window_t * window, void (*on_clicked)(float x, float y, int shi
             break;
           case SDLK_LSHIFT:
             window->shift_held = 1;
+            break;
+          case SDLK_c:
+            toggle();
             break;
           default:
             break;

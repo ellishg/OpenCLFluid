@@ -29,6 +29,6 @@ void destroy_window(window_t * window);
 
 void render_window(window_t * window, int fps);
 
-void poll_events(window_t * window, void (*on_clicked)(float x, float y, int shift_held), void (*on_release)(void));
+void poll_events(window_t * window, void (*on_clicked)(float x, float y, int shift_held), void (*toggle)(), void (*on_release)(void));
 
 #endif

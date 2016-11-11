@@ -16,9 +16,9 @@ __kernel void diffuse_bad(__global float * dest, __global float * src, float a)
   int right_id_b = right_id_a + 1;
   int left_id_a = center_id_a - 2;
   int left_id_b = left_id_a + 1;
-  int up_id_a = center_id_a - 2 * STRIDE;
+  int up_id_a = center_id_a - DOUBLE_STRIDE;
   int up_id_b = up_id_a + 1;
-  int down_id_a = center_id_a + 2 * STRIDE;
+  int down_id_a = center_id_a + DOUBLE_STRIDE;
   int down_id_b = down_id_a + 1;
 
   float center_src_a = src[center_id_a];
@@ -40,9 +40,9 @@ __kernel void diffuse(__global float * dest, __global float * src, float a, floa
   int right_id_b = right_id_a + 1;
   int left_id_a = center_id_a - 2;
   int left_id_b = left_id_a + 1;
-  int up_id_a = center_id_a - 2 * STRIDE;
+  int up_id_a = center_id_a - DOUBLE_STRIDE;
   int up_id_b = up_id_a + 1;
-  int down_id_a = center_id_a + 2 * STRIDE;
+  int down_id_a = center_id_a + DOUBLE_STRIDE;
   int down_id_b = down_id_a + 1;
 
   dest[center_id_a] = (src[center_id_a] + a * (dest[left_id_a] + dest[right_id_a] + dest[up_id_a] + dest[down_id_a])) * denominator;
@@ -74,7 +74,7 @@ __kernel void advect(__global float * dest, __global float * src, __global float
   int upper_left_b = upper_left_a + 1;
   int upper_right_a = upper_left_a + 2;
   int upper_right_b = upper_right_a + 1;
-  int lower_left_a = upper_left_a + 2 * STRIDE;
+  int lower_left_a = upper_left_a + DOUBLE_STRIDE;
   int lower_left_b = lower_left_a + 1;
   int lower_right_a = lower_left_a + 2;
   int lower_right_b = lower_right_a + 1;
@@ -93,8 +93,8 @@ __kernel void project_A(__global float * tmp, __global float * vel, float h)
 
   int right_id_a = center_id_a + 2;
   int left_id_a = center_id_a - 2;
-  int up_id_b = center_id_b - 2 * STRIDE;
-  int down_id_b = center_id_b + 2 * STRIDE;
+  int up_id_b = center_id_b - DOUBLE_STRIDE;
+  int down_id_b = center_id_b + DOUBLE_STRIDE;
 
   tmp[center_id_a] = h * (vel[left_id_a] - vel[right_id_a] + vel[up_id_b] - vel[down_id_b]);
   tmp[center_id_b] = 0;
@@ -110,8 +110,8 @@ __kernel void project_B(__global float * tmp)
 
   int right_id_b = center_id_b + 2;
   int left_id_b = center_id_b - 2;
-  int up_id_b = center_id_b - 2 * STRIDE;
-  int down_id_b = center_id_b + 2 * STRIDE;
+  int up_id_b = center_id_b - DOUBLE_STRIDE;
+  int down_id_b = center_id_b + DOUBLE_STRIDE;
 
   tmp[center_id_b] = 0.25f * (tmp[center_id_a] + tmp[left_id_b] + tmp[right_id_b] + tmp[up_id_b] + tmp[down_id_b]);
 }
@@ -126,8 +126,8 @@ __kernel void project_C(__global float * vel, __global float * tmp, float h)
 
   int right_id_b = center_id_b + 2;
   int left_id_b = center_id_b - 2;
-  int up_id_b = center_id_b - 2 * STRIDE;
-  int down_id_b = center_id_b + 2 * STRIDE;
+  int up_id_b = center_id_b - DOUBLE_STRIDE;
+  int down_id_b = center_id_b + DOUBLE_STRIDE;
 
   vel[center_id_a] += h * (tmp[left_id_b] - tmp[right_id_b]);
   vel[center_id_b] += h * (tmp[up_id_b] - tmp[down_id_b]);
@@ -168,6 +168,7 @@ __kernel void add_event_sources(__global float * dest, __constant int * x, __con
   // maybe we should cap dest[idx] to MAX_DENSITY here
 }
 
+// TODO: clean up this function
 __kernel void set_bnd(__global float * dest, int vec_type)
 {
   const int gid = get_global_id(0) + 1;
@@ -193,8 +194,8 @@ __kernel void set_bnd(__global float * dest, int vec_type)
   }
   else  { // if we are a corner
     // top left
-    dest[0] = 0.5f * (dest[2] + dest[2 * STRIDE]);
-    dest[1] = 0.5f * (dest[3] + dest[2 * STRIDE + 1]);
+    dest[0] = 0.5f * (dest[2] + dest[DOUBLE_STRIDE]);
+    dest[1] = 0.5f * (dest[3] + dest[DOUBLE_STRIDE + 1]);
     // bottom left
     dest[2 * (STRIDE * (SIM_SIZE + 1)) + 0] = 0.5f * (dest[2 * (1 + STRIDE * (SIM_SIZE + 1)) + 0] + dest[2 * (STRIDE * SIM_SIZE) + 0]);
     dest[2 * (STRIDE * (SIM_SIZE + 1)) + 1] = 0.5f * (dest[2 * (1 + STRIDE * (SIM_SIZE + 1)) + 1] + dest[2 * (STRIDE * SIM_SIZE) + 1]);
@@ -222,8 +223,6 @@ __kernel void make_framebuffer(write_only image2d_t dest, __global float * src)
   int idx_b = IDX(gid_x + 1, gid_y + 1, 1);
 
   float3 final_color = first_color * min(src[idx_a], 1.f) + second_color * min(src[idx_b], 1.f);
-
-  //final_color = (float3)((gid_x % 10) * 0.1, 0, 0);
 
   write_imagef(dest, (int2)(gid_x, gid_y), (float4)(final_color, 1.f));
 }

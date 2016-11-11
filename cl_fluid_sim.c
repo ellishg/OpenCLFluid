@@ -35,7 +35,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   // TODO: be smarter about setting these values
   fluid->local_size[0] = 512;
   fluid->local_size[1] = 512;
-  fluid->full_global_size = 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2);
+  fluid->buffer_size = 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2);
   fluid->full_local_size = 8;
   fluid->set_bnd_global_size = (fluid->sim_size + 1);
   fluid->set_bnd_local_size = 1;
@@ -177,6 +177,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   char * kernel_definitions = malloc(256);
   snprintf(kernel_definitions, 256, "-D SIM_SIZE=%zu "
                                     "-D STRIDE=%zu "
+                                    "-D DOUBLE_STRIDE=%zu "
                                     "-D MAX_DENSITY=%d "
                                     "-D IS_DENSITY=%d "
                                     "-D IS_A_DENSITY=%d "
@@ -184,7 +185,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
                                     "-D IS_VELOCITY=%d "
                                     "-D IS_U_VELOCITY=%d "
                                     "-D IS_V_VELOCITY=%d "
-                                    , fluid->sim_size, fluid->stride, MAX_DENSITY, IS_DENSITY, IS_A_DENSITY, IS_B_DENSITY, IS_VELOCITY, IS_U_VELOCITY, IS_V_VELOCITY);
+                                    , fluid->sim_size, fluid->stride, 2 * fluid->stride, MAX_DENSITY, IS_DENSITY, IS_A_DENSITY, IS_B_DENSITY, IS_VELOCITY, IS_U_VELOCITY, IS_V_VELOCITY);
 
   err = clBuildProgram(fluid->program, 1, &fluid_device, kernel_definitions, NULL, NULL);
   free(kernel_definitions);
@@ -216,13 +217,13 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   check_error(err, "Unable to create make_framebuffer");
 
   // TODO in the future, maybe I could optimize this to one memory location
-  fluid->density_mem[0] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2) * sizeof(cl_float), NULL, &err);
+  fluid->density_mem[0] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, fluid->buffer_size * sizeof(cl_float), NULL, &err);
   check_error(err, "Unable to create buffer");
-  fluid->density_mem[1] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2) * sizeof(cl_float), NULL, &err);
+  fluid->density_mem[1] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, fluid->buffer_size * sizeof(cl_float), NULL, &err);
   check_error(err, "Unable to create buffer");
-  fluid->velocity_mem[0] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2) * sizeof(cl_float), NULL, &err);
+  fluid->velocity_mem[0] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, fluid->buffer_size * sizeof(cl_float), NULL, &err);
   check_error(err, "Unable to create buffer");
-  fluid->velocity_mem[1] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2) * sizeof(cl_float), NULL, &err);
+  fluid->velocity_mem[1] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, fluid->buffer_size * sizeof(cl_float), NULL, &err);
   check_error(err, "Unable to create buffer");
   if (fluid->is_using_opengl)
   {
@@ -295,8 +296,8 @@ void simulate_next_frame(FluidSim * fluid, float dt)
   fluid->calls_to_make_framebuffer = 0;
 
   cl_float pattern = 0;
-  err = clEnqueueFillBuffer(fluid->command_queue, fluid->density_mem[PREV], (void *)&pattern, sizeof(cl_float), 0, 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2) * sizeof(cl_float), 0, NULL, NULL);
-  err |= clEnqueueFillBuffer(fluid->command_queue, fluid->velocity_mem[PREV], (void *)&pattern, sizeof(cl_float), 0, 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2) * sizeof(cl_float), 0, NULL, NULL);
+  err = clEnqueueFillBuffer(fluid->command_queue, fluid->density_mem[PREV], (void *)&pattern, sizeof(cl_float), 0, fluid->buffer_size * sizeof(cl_float), 0, NULL, NULL);
+  err |= clEnqueueFillBuffer(fluid->command_queue, fluid->velocity_mem[PREV], (void *)&pattern, sizeof(cl_float), 0, fluid->buffer_size * sizeof(cl_float), 0, NULL, NULL);
   check_error(err, "Unable to clear buffers");
 
   add_event_sources(fluid, &fluid->density_mem[PREV], &fluid->a_density_events, IS_A_DENSITY);
@@ -484,7 +485,7 @@ void add_source(FluidSim * fluid, cl_mem * dest, cl_mem * src, cl_float dt)
   check_error(err, "Unable to set args");
 
   // enqueue add_source
-  err = clEnqueueNDRangeKernel(fluid->command_queue, fluid->add_source_kernel, 1, NULL, &fluid->full_global_size, &fluid->full_local_size, 0, NULL, &fluid->add_source_event);
+  err = clEnqueueNDRangeKernel(fluid->command_queue, fluid->add_source_kernel, 1, NULL, &fluid->buffer_size, &fluid->full_local_size, 0, NULL, &fluid->add_source_event);
   check_error(err, "Unable to enqueue add_source");
   fluid->calls_to_add_source++;
 }
