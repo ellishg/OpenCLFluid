@@ -34,7 +34,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   fluid->global_size[1] = fluid->sim_size;
   // TODO: be smarter about setting these values
   fluid->local_size[0] = 512;
-  fluid->local_size[1] = 1;
+  fluid->local_size[1] = 512;
   fluid->full_global_size = 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2);
   fluid->full_local_size = 8;
   fluid->set_bnd_global_size = (fluid->sim_size + 1);
@@ -89,7 +89,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   err = clGetDeviceIDs(fluid_platform, CL_DEVICE_TYPE_ALL, num_available_devices, devices, NULL);
   check_error(err, "Unable to get device IDs");
 
-  cl_device_id fluid_device = -1;
+  cl_device_id fluid_device = NULL;
   cl_device_type device_type;
 
   // TODO: Be smarter about picking a device
@@ -123,7 +123,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
     }
   }
 
-  if (fluid_device == -1)
+  if (fluid_device == NULL)
   {
     check_error(-1, "Unable to find device");
   }
@@ -135,7 +135,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   clGetDeviceInfo(fluid_device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t[max_work_item_dimensions]), max_work_item_size, NULL);
 
   fluid->local_size[0] = fmin(fluid->sim_size, fmin(fluid->local_size[0], max_work_item_size[0]));
-  fluid->local_size[1] = fmin(fluid->sim_size, fmin(fluid->local_size[1], max_work_item_size[1]));
+  fluid->local_size[1] = fmin(fluid->sim_size, fmin(fluid->local_size[1], max_work_item_size[1] / fluid->local_size[0]));
   if (flags & F_DEBUG)
   {
     fprintf(stdout, "Max work item size (%zu, %zu)\nlocal work size (%zu, %zu)\n", max_work_item_size[0], max_work_item_size[1], fluid->local_size[0], fluid->local_size[1]);

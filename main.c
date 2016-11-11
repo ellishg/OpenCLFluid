@@ -85,8 +85,8 @@ int main(int argc, char ** argv)
 {
 
   FLAGS flags = 0;
-  float viscosity = 0.00001;
-  float diffusion_rate = 0.000001;
+  float viscosity = 0.00001f;
+  float diffusion_rate = 0.000001f;
   size_t sim_size = 256;
 
   int has_chosen_type = 0;
@@ -115,12 +115,17 @@ int main(int argc, char ** argv)
         if (strcmp(optarg, "CPU") == 0)
         {
           flags |= F_USE_CPU;
+          has_chosen_type = 1;
         }
         else if (strcmp(optarg, "GPU") == 0)
         {
           flags |= F_USE_GPU;
+          has_chosen_type = 1;
         }
-        has_chosen_type = 1;
+        else {
+          fprintf(stderr, "Invalid device type.\n");
+          return 1;
+        }
         break;
       default:
         break;

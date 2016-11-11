@@ -39,12 +39,17 @@ int main(int argc, char ** argv)
         if (strcmp(optarg, "CPU") == 0)
         {
           flags |= F_USE_CPU;
+          has_chosen_type = 1;
         }
         else if (strcmp(optarg, "GPU") == 0)
         {
           flags |= F_USE_GPU;
+          has_chosen_type = 1;
         }
-        has_chosen_type = 1;
+        else {
+          fprintf(stderr, "Invalid device type.\n");
+          return 1;
+        }
         break;
       default:
         break;
@@ -57,7 +62,7 @@ int main(int argc, char ** argv)
   }
 
   // zero is never a valid texture
-  my_fluid_sim = create_fluid_sim(0, "fluid_kernel.cl", sim_size, 0.00001, 0.00001, flags);
+  my_fluid_sim = create_fluid_sim(0, "fluid_kernel.cl", sim_size, 0.00001f, 0.00001f, flags);
 
 #ifdef __APPLE__
   struct timespec start, end;

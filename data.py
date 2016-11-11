@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 
 class DeviceRunningTime:
 
-    def __init__(self, n):
-        self.name = n
+    def __init__(self, name):
+        self.name = name
         self.sim_size = []
         self.add_event = []
         self.add_source = []
@@ -41,15 +41,15 @@ class DeviceRunningTime:
         plt.plot(self.sim_size, self.project_b, label="Project B")
         plt.plot(self.sim_size, self.project_c, label="Project C")
         plt.plot(self.sim_size, self.runtime, label="GPU")
-        plt.plot(self.sim_size, self.total_runtime, label="Total")
+        plt.plot(self.sim_size, self.total_runtime, label="Total", linewidth=3)
         plt.legend(loc="upper left")
         plt.title(self.name)
         plt.xlabel("Simulation Size")
         plt.ylabel("Runtime (ms)")
         plt.axis((64, 2048, 0, 1000))
 
-    def plotTotalRuntime(self):
-        plt.plot(self.sim_size, self.total_runtime, label=self.name)
+    def plotTotalRuntime(self, w=1):
+        plt.plot(self.sim_size, self.total_runtime, label=self.name, linewidth=w)
 
 
 macbookA = DeviceRunningTime("Apple: HD Graphics 4000 (Local Size=16x16)")
@@ -98,6 +98,14 @@ macbookF.set_runtimes(512, 9.789, 5.207, 2.357, 40.675, 2.371, 1.384, 20.550, 1.
 macbookF.set_runtimes(1024, 35.847, 19.465, 5.040, 153.125, 9.223, 3.644, 74.553, 4.419, 305.316, 286)
 macbookF.set_runtimes(2048, 136.918, 72.726, 8.668, 605.247, 34.463, 14.588, 286.576, 16.756, 1175.941, 1085)
 
+macbookG = DeviceRunningTime("Apple: HD Graphics 4000 (Local Size=As Wide as Possible)")
+macbookG.set_runtimes(64, 0.044, 0.022, 0.336, 0.352, 0.020, 0.015, 0.266, 0.016, 1.071, 8)
+macbookG.set_runtimes(128, 0.126, 0.065, 0.513, 1.040, 0.060, 0.038, 0.758, 0.043, 2.643, 11)
+macbookG.set_runtimes(256, 0.452, 0.232, 0.864, 3.502, 0.224, 0.121, 2.210, 0.153, 7.757, 17)
+macbookG.set_runtimes(512, 1.772, 0.913, 1.688, 15.417, 1.139, 0.678, 7.911, 0.734, 30.252, 43)
+macbookG.set_runtimes(1024, 6.932, 3.566, 2.878, 70.300, 5.041, 3.193, 41.577, 3.264, 136.753, 155)
+macbookG.set_runtimes(2048, 27.523, 14.194, 4.427, 279.631, 19.839, 12.574, 159.745, 12.280, 530.212, 555)
+
 plt.figure(1)
 macbookA.plot()
 
@@ -117,12 +125,16 @@ plt.figure(6)
 macbookF.plot()
 
 plt.figure(7)
+macbookG.plot()
+
+plt.figure(8)
 macbookA.plotTotalRuntime()
 macbookB.plotTotalRuntime()
 macbookC.plotTotalRuntime()
 macbookD.plotTotalRuntime()
 macbookE.plotTotalRuntime()
-macbookF.plotTotalRuntime()
+macbookF.plotTotalRuntime(3)
+macbookG.plotTotalRuntime()
 plt.legend(loc="upper left", fontsize=8)
 plt.title("Total Runtime")
 plt.xlabel("Simulation Size")
