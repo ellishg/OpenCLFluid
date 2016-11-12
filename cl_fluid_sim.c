@@ -337,6 +337,7 @@ void simulate_next_frame(FluidSim * fluid, float dt)
     }
 
     fprintf(stdout, "Total GPU runtime: %.3f ms\nTotal wallclock time: %.0f ms\n\n", total_ms, 1000.f * dt);
+    //fprintf(stdout, "%.3f\n%0.f\n\n", total_ms, 1000.f * dt);
     fluid->cur_sample = (fluid->cur_sample + 1) % NUM_SAMPLES;
   }
 }
@@ -624,6 +625,7 @@ float profile_event(cl_event event, size_t times_run, cl_ulong samples[NUM_SAMPL
   float bandwidth = n * n * 4 * entries / ms * 1000 / (1024 * 1024 * 1024);
 
   fprintf(stdout, "%.3f ms at %.2f GB/s (ran %lu times) for %s\n", ms * times_run, bandwidth, times_run, str);
+  //fprintf(stdout, "%.3f\n", ms * times_run);
 
   return ms * times_run;
 }

@@ -211,10 +211,12 @@ __kernel void set_bnd(__global float * dest, int vec_type)
 __kernel void make_framebuffer(write_only image2d_t dest, __global float * src)
 {
   // each channel should sum to no more than 1.f
-  const float3 first_color = (float3)(1.f, 0.54f, 0.f);
-  const float3 second_color = (float3)(0.f, 0.f, 1.f);
+  //const float3 first_color = (float3)(1.f, 0.54f, 0.f);
+  //const float3 second_color = (float3)(0.f, 0.f, 1.f);
   //const float3 first_color = (float3)(0.f, 0.5f, 0.f);
   //const float3 second_color = (float3)(0.5f, 0.5f, 0.f);
+  const float3 first_color = (float3)(1.f, 1.f, 1.f);
+  const float3 second_color = (float3)(1.f, 0.f, 1.f);
 
   int gid_x = get_global_id(0);
   int gid_y = get_global_id(1);
