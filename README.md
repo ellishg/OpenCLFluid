@@ -4,6 +4,8 @@ http://www.intpowertechcorp.com/GDC03.pdf
 
 Make sure you have SDL2, OpenGL, and OpenCL installed to run.
 
+Currently this will only run on a Mac. To install SDL2 go to https://www.libsdl.org/download-2.0.php and download the Development Library. 
+
 # Usage
 ```Bash
 ./fluid [-pb] [-t <CPU/GPU>] [-n <simulation size>] [-v <viscosity>] [-d <rate of diffusion>]
