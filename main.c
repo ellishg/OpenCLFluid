@@ -12,7 +12,7 @@
 
 #define WINDOW_WIDTH 600
 #define WINDOW_HEIGHT 600
-#define MAX_FPS 60
+#define MAX_FPS 30
 
 extern char * optarg;
 
