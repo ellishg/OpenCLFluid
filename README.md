@@ -27,7 +27,7 @@ Currently this will only run on a Mac. To install SDL2 go to https://www.libsdl.
 The profile executable does not use SDL2 and will not render the simulation. It will only print useful profiling information.
 
 ```Bash
-./profile -t <CPU/GPU> -n <simulation size>
+./profile [-t <CPU/GPU>] [-n <simulation size>]
 ```
 
 # Demo
