@@ -33,8 +33,8 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   fluid->global_size[0] = fluid->sim_size;
   fluid->global_size[1] = fluid->sim_size;
   // TODO: be smarter about setting these values
-  fluid->local_size[0] = 512;
-  fluid->local_size[1] = 512;
+  fluid->local_size[0] = 128;
+  fluid->local_size[1] = 128;
   fluid->buffer_size = 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2);
   fluid->full_local_size = 8;
   fluid->set_bnd_global_size = (fluid->sim_size + 1);
@@ -126,6 +126,12 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   if (fluid_device == NULL)
   {
     check_error(-1, "Unable to find device");
+  }
+
+  if (flags & F_DEBUG)
+  {
+    clGetDeviceInfo(fluid_device, CL_DEVICE_NAME, 100, name, NULL);
+    fprintf(stdout, "Chosen device: %s\n", name);
   }
 
   size_t max_work_item_dimensions;
