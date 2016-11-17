@@ -135,11 +135,13 @@ typedef struct fluid_sim_t
   SourceEventList u_velocity_events;
   SourceEventList v_velocity_events;
 
+  int num_relaxation_steps;
+
   float diffusion_rate;
   float viscosity;
 } FluidSim;
 
-FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename, size_t sim_size, float diff, float visc, FLAGS flags);
+FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename, size_t sim_size, float diff, float visc, int num_r_steps, FLAGS flags);
 
 void destroy_fluid_sim(FluidSim * fluid);
 

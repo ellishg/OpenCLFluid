@@ -97,12 +97,13 @@ int main(int argc, char ** argv)
   FLAGS flags = 0;
   float viscosity = 0.0000001f;
   float diffusion_rate = 0.0001f;
+  int num_r_steps = 20;
   size_t sim_size = 256;
 
   int has_chosen_type = 0;
 
   int ch;
-  while ((ch = getopt(argc, argv, "bpv:d:n:t:")) != -1)
+  while ((ch = getopt(argc, argv, "bpv:d:n:t:r:")) != -1)
   {
     switch (ch)
     {
@@ -137,6 +138,9 @@ int main(int argc, char ** argv)
           return 1;
         }
         break;
+      case 'r':
+        num_r_steps = atoi(optarg);
+        break;
       default:
         break;
     }
@@ -155,7 +159,7 @@ int main(int argc, char ** argv)
     return 2;
   }
 
-  my_fluid_sim = create_fluid_sim(my_window->window_texture, "fluid_kernel.cl", sim_size, diffusion_rate, viscosity, flags);
+  my_fluid_sim = create_fluid_sim(my_window->window_texture, "fluid_kernel.cl", sim_size, diffusion_rate, viscosity, num_r_steps, flags);
 
   if (!my_fluid_sim)
   {

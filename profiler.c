@@ -24,11 +24,12 @@ int main(int argc, char ** argv)
   signal(SIGINT, quit);
 
   size_t sim_size = 512;
+  int num_r_steps = 20;
   FLAGS flags = F_PROFILE;
   int has_chosen_type = 0;
 
   int ch;
-  while ((ch = getopt(argc, argv, "n:t:")) != -1)
+  while ((ch = getopt(argc, argv, "n:t:r:")) != -1)
   {
     switch (ch)
     {
@@ -51,6 +52,9 @@ int main(int argc, char ** argv)
           return 1;
         }
         break;
+      case 'r':
+        num_r_steps = atoi(optarg);
+        break;
       default:
         break;
     }
@@ -62,7 +66,7 @@ int main(int argc, char ** argv)
   }
 
   // zero is never a valid texture
-  my_fluid_sim = create_fluid_sim(0, "fluid_kernel.cl", sim_size, 0.00001f, 0.00001f, flags);
+  my_fluid_sim = create_fluid_sim(0, "fluid_kernel.cl", sim_size, 0.00001f, 0.00001f, num_r_steps, flags);
 
 #ifdef __APPLE__
   struct timespec start, end;

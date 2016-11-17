@@ -2,7 +2,7 @@
 
 cl_int err;
 
-FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename, size_t sim_size, float diff, float visc, FLAGS flags)
+FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename, size_t sim_size, float diff, float visc, int num_r_steps, FLAGS flags)
 {
   FluidSim * fluid = (FluidSim *)malloc(sizeof(FluidSim));
 
@@ -27,6 +27,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
 
   fluid->sim_size = sim_size;
   fluid->stride = sim_size + 2;
+  fluid->num_relaxation_steps = num_r_steps;
   fluid->diffusion_rate = diff;
   fluid->viscosity = visc;
 
@@ -397,7 +398,7 @@ void diffuse(FluidSim * fluid, cl_mem * dest, cl_mem * src, cl_float a, VEC_TYPE
 
     cl_float denominator = 1 / (1 + 4 * a);
 
-    for (int k = 0; k < 20; k++)
+    for (int k = 0; k < fluid->num_relaxation_steps; k++)
     {
       //__kernel void diffuse(__global float * dest, __global float * src, float a, float denominator)
       err = clSetKernelArg(fluid->diffuse_kernel, 0, sizeof(cl_mem), dest);
@@ -453,7 +454,7 @@ void project(FluidSim * fluid, cl_mem * vel, cl_mem * tmp)
 
   set_bnd(fluid, tmp, IS_NONE);
 
-  for (int k = 0; k < 20; k++)
+  for (int k = 0; k < fluid->num_relaxation_steps; k++)
   {
     //__kernel void project_B(__global float * tmp)
     err = clSetKernelArg(fluid->project_b_kernel, 0, sizeof(cl_mem), tmp);
