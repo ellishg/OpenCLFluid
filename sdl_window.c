@@ -46,7 +46,7 @@ window_t * create_window(size_t window_width, size_t window_height, size_t sim_s
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, sim_size, sim_size, 0, GL_RGBA, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, sim_size, sim_size, 0, GL_RGBA, GL_FLOAT, NULL);
 
   GLenum err = glGetError();
   if (err != GL_NO_ERROR)

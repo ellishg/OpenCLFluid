@@ -222,7 +222,7 @@ __kernel void make_framebuffer(write_only image2d_t dest, __global float * src)
   int gid_y = get_global_id(1);
 
   int idx_a = IDX(gid_x + 1, gid_y + 1, 0);
-  int idx_b = IDX(gid_x + 1, gid_y + 1, 1);
+  int idx_b = idx_a + 1;
 
   float3 final_color = first_color * min(src[idx_a], 1.f) + second_color * min(src[idx_b], 1.f);
 

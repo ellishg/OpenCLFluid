@@ -530,7 +530,9 @@ void copy_to_framebuffer(FluidSim * fluid, cl_mem * src)
     check_error(err, "Unable to enque make_framebuffer");
     fluid->calls_to_make_framebuffer++;
 
-    clFinish(fluid->command_queue);
+    err = clFlush(fluid->command_queue);
+    err |= clFinish(fluid->command_queue);
+    check_error(err, "Unable to finish queue");
 
     err = clEnqueueReleaseGLObjects(fluid->command_queue, 1, &fluid->framebuffer, 0, 0, NULL);
     check_error(err, "Unable to release texture");
