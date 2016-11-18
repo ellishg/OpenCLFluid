@@ -246,8 +246,8 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   fluid->source_max_radius_sqrd = clCreateBuffer(fluid->context, CL_MEM_READ_ONLY, MAX_NUM_SIMULTANEOUS_EVENTS * sizeof(cl_int), NULL, &err);
   check_error(err, "Unable to create buffer");
 
-  err = clFlush(fluid->command_queue);
-  err |= clFinish(fluid->command_queue);
+  //err = clFlush(fluid->command_queue);
+  err = clFinish(fluid->command_queue);
   check_error(err, "Unable to finish queue");
 
   return fluid;
@@ -255,7 +255,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
 
 void destroy_fluid_sim(FluidSim * fluid)
 {
-  clFlush(fluid->command_queue);
+  //clFlush(fluid->command_queue);
   clFinish(fluid->command_queue);
 
   clReleaseMemObject(fluid->density_mem[0]);
@@ -318,8 +318,8 @@ void simulate_next_frame(FluidSim * fluid, float dt)
 
   copy_to_framebuffer(fluid, &fluid->density_mem[CUR]);
 
-  err = clFlush(fluid->command_queue);
-  err |= clFinish(fluid->command_queue);
+  //err = clFlush(fluid->command_queue);
+  err = clFinish(fluid->command_queue);
   check_error(err, "Unable to finish queue");
 
   if (fluid->profile)
@@ -530,8 +530,8 @@ void copy_to_framebuffer(FluidSim * fluid, cl_mem * src)
     check_error(err, "Unable to enque make_framebuffer");
     fluid->calls_to_make_framebuffer++;
 
-    err = clFlush(fluid->command_queue);
-    err |= clFinish(fluid->command_queue);
+    //err = clFlush(fluid->command_queue);
+    err = clFinish(fluid->command_queue);
     check_error(err, "Unable to finish queue");
 
     err = clEnqueueReleaseGLObjects(fluid->command_queue, 1, &fluid->framebuffer, 0, 0, NULL);
