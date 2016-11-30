@@ -4,7 +4,7 @@ http://www.intpowertechcorp.com/GDC03.pdf
 
 Make sure you have SDL2, OpenGL, and OpenCL installed to run.
 
-Currently this will only run on a Mac. To install SDL2 go to https://www.libsdl.org/download-2.0.php and download the Development Library. 
+Currently this will only run on a Mac. To install SDL2 go to https://www.libsdl.org/download-2.0.php and download the Development Library.
 
 # Usage
 ```Bash
@@ -17,9 +17,9 @@ Currently this will only run on a Mac. To install SDL2 go to https://www.libsdl.
 
 -t chooses if you want to try to run on the CPU or GPU (defaults to GPU).
 
--n sets the simulations size (defaults to 256). This will generate a n x n simulation grid. Note that the simulation size must be a power of 2.
+-n sets the simulations size (defaults to 128). This will generate a n x n simulation grid. Note that the simulation size must be a power of 2.
 
--v sets the viscosity of the fluid (defaults to 0.0000001f).
+-v sets the viscosity of the fluid (defaults to 0.0001f).
 
 -d sets the rate of diffusion of the fluid (defaults to 0.0001f).
 

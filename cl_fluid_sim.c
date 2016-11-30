@@ -223,7 +223,6 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   fluid->make_framebuffer_kernel = clCreateKernel(fluid->program, "make_framebuffer", &err);
   check_error(err, "Unable to create make_framebuffer");
 
-  // TODO in the future, maybe I could optimize this to one memory location
   fluid->density_mem[0] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, fluid->buffer_size * sizeof(cl_float), NULL, &err);
   check_error(err, "Unable to create buffer");
   fluid->density_mem[1] = clCreateBuffer(fluid->context, CL_MEM_READ_WRITE, fluid->buffer_size * sizeof(cl_float), NULL, &err);

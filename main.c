@@ -95,10 +95,10 @@ int main(int argc, char ** argv)
 {
 
   FLAGS flags = 0;
-  float viscosity = 0.0000001f;
+  float viscosity = 0.0001f;
   float diffusion_rate = 0.0001f;
   int num_r_steps = 20;
-  size_t sim_size = 256;
+  size_t sim_size = 128;
 
   int has_chosen_type = 0;
 
@@ -178,8 +178,7 @@ int main(int argc, char ** argv)
     add_stream(my_fluid_sim, 0.25f, 0.25f, 1.f, 1.f, 1.f, 1.f, IS_A_DENSITY);
     add_stream(my_fluid_sim, 0.75f, 0.25f, -1.f, 1.f, 1.f, 1.f, IS_A_DENSITY);
     //add_stream(my_fluid_sim, 0.5f, 0.5f, -1.f, 1.f, 1.f, 1.f, IS_A_DENSITY);
-
-    //add_stream(my_fluid_sim, 0.5f, 0.25f, 0.f, -1.f, 1.f, 2.f, IS_A_DENSITY);
+    //add_stream(my_fluid_sim, 0.5f, 0.25f, 0.f, -1.f, 1.f, 2.f, IS_B_DENSITY);
 
     simulate_next_frame(my_fluid_sim, dt);
 
