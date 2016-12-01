@@ -160,7 +160,9 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
     };
 #elif __linux__
     cl_context_properties properties[] = {
-      // TODO: put stuff here
+      CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
+      CL_GLX_DISPLAY_KHR, (cl_context_properties)glXGetCurrentDisplay(),
+      CL_CONTEXT_PLATFORM, (cl_context_properties)fluid_platform,
       0
     };
 #endif
