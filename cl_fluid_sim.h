@@ -6,12 +6,13 @@
 #include <math.h>
 
 #ifdef __APPLE__
-  #include "OpenCL/opencl.h"
-  #include "OpenGL/gl.h"
-  #include "OpenGL/opengl.h"
-#elif __linux__
-  #include "CL/cl.h"
-  #include "GL/gl.h"
+  #include <OpenCL/opencl.h>
+  #include <OpenGL/gl.h>
+  #include <OpenGL/opengl.h>
+#else
+  #include <CL/cl.h>
+  #include <GL/gl.h>
+  #include <GL/glut.h>
 #endif
 
 #define KB 1024
