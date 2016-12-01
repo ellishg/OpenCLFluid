@@ -3,12 +3,8 @@
 
 #include <stdio.h>
 
-#ifdef __APPLE__
-  #include "SDL2/SDL.h"
-  #include "SDL2/SDL_opengl.h"
-#elif __linux__
-  #include "SDL2/SDL.h"
-#endif
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_opengl.h>
 
 typedef struct window_t
 {
