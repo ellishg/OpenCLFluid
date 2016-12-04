@@ -19,10 +19,10 @@ EXE=fluid
 all: $(EXE) profiler
 
 $(EXE): $(C_FILES) $(H_FILES)
-	$(CC) $(FLAGS) $(C_FILES) -o$(EXE)
+	$(CC) $(C_FILES) $(FLAGS) -o$(EXE)
 
 profiler: profiler.c cl_fluid_sim.c cl_fluid_sim.h
-	$(CC) $(PROFILER_FLAGS) profiler.c cl_fluid_sim.c -oprofiler
+	$(CC) profiler.c cl_fluid_sim.c $(PROFILER_FLAGS) -oprofiler
 
 clean:
 	rm -f $(EXE) profiler

@@ -11,8 +11,9 @@
   #include <OpenGL/opengl.h>
 #else
   #include <CL/cl.h>
+	#include <CL/cl_gl.h>
   #include <GL/gl.h>
-  #include <GL/glut.h>
+//  #include <GL/glut.h>
 #endif
 
 #define KB 1024
