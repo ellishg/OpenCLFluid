@@ -4,7 +4,15 @@ http://www.intpowertechcorp.com/GDC03.pdf
 
 Make sure you have SDL2, OpenGL, and OpenCL installed to run.
 
-Currently this will only run on a Mac. To install SDL2 go to https://www.libsdl.org/download-2.0.php and download the Development Library.
+To install SDL2 go to https://www.libsdl.org/download-2.0.php and download the Development Library.
+
+To install SDL2, OpenGL, and OpenCL on Linux:
+```Bash
+sudo apt-get install libsdl2-dev
+sudo apt-get install freeglut3-dev
+sudo apt-get install opencl-headers
+sudo apt-get install ocl-icd-opencl-dev
+```
 
 # Usage
 ```Bash
