@@ -16,6 +16,8 @@ C_FILES=main.c cl_fluid_sim.c sdl_window.c
 H_FILES=cl_fluid_sim.h sdl_window.h
 EXE=fluid
 
+.PHONY: clean all
+
 all: $(EXE) profiler
 
 $(EXE): $(C_FILES) $(H_FILES)
