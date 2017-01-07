@@ -40,6 +40,4 @@ The profile executable does not use SDL2 and will not render the simulation. It 
 
 # Demo
 
-Note: This gif plays much faster than real life.
-
 ![demo](https://github.com/sparkasaurusRex/OpenCLFluid/blob/master/demo.gif)
