@@ -40,4 +40,4 @@ The profile executable does not use SDL2 and will not render the simulation. It 
 
 # Demo
 
-![demo](https://github.com/sparkasaurusRex/OpenCLFluid/blob/master/demo.gif | width=100)
+<img src="https://github.com/sparkasaurusRex/OpenCLFluid/blob/master/demo.gif" width=256>
