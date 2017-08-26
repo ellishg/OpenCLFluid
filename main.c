@@ -68,7 +68,7 @@ void on_release()
 
 void add_stream(FluidSim * fluid, float x, float y, float u, float v, float dens_strength, float vel_strength, VEC_TYPE source_type)
 {
-  const float radius = 0.05f;
+  const float radius = 0.1f;
 
   float u_offset = ((rand() % 100) - 50) / 30.f;
   float v_offset = ((rand() % 100) - 50) / 30.f;
@@ -95,10 +95,10 @@ int main(int argc, char ** argv)
 {
 
   FLAGS flags = 0;
-  float viscosity = 0.0001f;
-  float diffusion_rate = 0.0001f;
+  float viscosity = 0.00001f;
+  float diffusion_rate = 0.00001f;
   int num_r_steps = 20;
-  size_t sim_size = 128;
+  size_t sim_size = 1024;
 
   int has_chosen_type = 0;
 
@@ -174,9 +174,9 @@ int main(int argc, char ** argv)
     float dt = (SDL_GetTicks() - prev_time) / 1000.f;
     prev_time = SDL_GetTicks();
 
-    add_stream(my_fluid_sim, 0.5f, 0.75f, 0.f, -1.f, 1.f, 1.f, IS_B_DENSITY);
-    add_stream(my_fluid_sim, 0.25f, 0.25f, 1.f, 1.f, 1.f, 1.f, IS_A_DENSITY);
-    add_stream(my_fluid_sim, 0.75f, 0.25f, -1.f, 1.f, 1.f, 1.f, IS_A_DENSITY);
+    add_stream(my_fluid_sim, 0.5f, 0.75f, 0.f, -1.f, 10.f, 5.f, IS_B_DENSITY);
+    add_stream(my_fluid_sim, 0.25f, 0.25f, 1.f, 1.f, 10.f, 5.f, IS_A_DENSITY);
+    add_stream(my_fluid_sim, 0.75f, 0.25f, -1.f, 1.f, 10.f, 5.f, IS_A_DENSITY);
     //add_stream(my_fluid_sim, 0.5f, 0.5f, -1.f, 1.f, 1.f, 1.f, IS_A_DENSITY);
     //add_stream(my_fluid_sim, 0.5f, 0.25f, 0.f, -1.f, 1.f, 2.f, IS_B_DENSITY);
 

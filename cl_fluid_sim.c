@@ -34,8 +34,8 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   fluid->global_size[0] = fluid->sim_size;
   fluid->global_size[1] = fluid->sim_size;
   // TODO: be smarter about setting these values
-  fluid->local_size[0] = 128;
-  fluid->local_size[1] = 128;
+  fluid->local_size[0] = 32;
+  fluid->local_size[1] = 32;
   fluid->buffer_size = 2 * (fluid->sim_size + 2) * (fluid->sim_size + 2);
   fluid->full_local_size = 8;
   fluid->set_bnd_global_size = (fluid->sim_size + 1);
@@ -148,8 +148,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
     fprintf(stdout, "Max work item size (%zu, %zu)\nlocal work size (%zu, %zu)\n", max_work_item_size[0], max_work_item_size[1], fluid->local_size[0], fluid->local_size[1]);
   }
 
-  if (fluid->is_using_opengl)
-  {
+  if (fluid->is_using_opengl) {
 #ifdef __APPLE__
     CGLContextObj gl_context = CGLGetCurrentContext();
     CGLShareGroupObj gl_share_group = CGLGetShareGroup(gl_context);
@@ -235,7 +234,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   check_error(err, "Unable to create buffer");
   if (fluid->is_using_opengl)
   {
-    fluid->framebuffer = clCreateFromGLTexture2D(fluid->context, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, window_texture, &err);
+    fluid->framebuffer = clCreateFromGLTexture(fluid->context, CL_MEM_WRITE_ONLY, GL_TEXTURE_2D, 0, window_texture, &err);
     check_error(err, "Unable to create cl/gl texture");
   }
   fluid->source_x = clCreateBuffer(fluid->context, CL_MEM_READ_ONLY, MAX_NUM_SIMULTANEOUS_EVENTS * sizeof(cl_int), NULL, &err);
@@ -247,7 +246,7 @@ FluidSim * create_fluid_sim(GLuint window_texture, const char * kernel_filename,
   fluid->source_max_radius_sqrd = clCreateBuffer(fluid->context, CL_MEM_READ_ONLY, MAX_NUM_SIMULTANEOUS_EVENTS * sizeof(cl_int), NULL, &err);
   check_error(err, "Unable to create buffer");
 
-  //err = clFlush(fluid->command_queue);
+  // err = clFlush(fluid->command_queue);
   err = clFinish(fluid->command_queue);
   check_error(err, "Unable to finish queue");
 
