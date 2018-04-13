@@ -3,6 +3,7 @@
  */
 
 #include <unistd.h>
+#include <getopt.h>
 #include <time.h>
 #include <signal.h>
 

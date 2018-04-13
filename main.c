@@ -6,6 +6,7 @@
  */
 
 #include <unistd.h>
+#include <getopt.h>
 
 #include "sdl_window.h"
 #include "cl_fluid_sim.h"
