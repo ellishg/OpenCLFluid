@@ -160,7 +160,7 @@ int main(int argc, char ** argv)
     return 2;
   }
 
-  my_fluid_sim = create_fluid_sim(my_window->window_texture, "fluid_kernel.cl", sim_size, diffusion_rate, viscosity, num_r_steps, flags);
+  my_fluid_sim = create_fluid_sim(my_window->window_texture, "../src/fluid_kernel.cl", sim_size, diffusion_rate, viscosity, num_r_steps, flags);
 
   if (!my_fluid_sim)
   {

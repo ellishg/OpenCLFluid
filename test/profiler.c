@@ -67,7 +67,7 @@ int main(int argc, char ** argv)
   }
 
   // zero is never a valid texture
-  my_fluid_sim = create_fluid_sim(0, "fluid_kernel.cl", sim_size, 0.00001f, 0.00001f, num_r_steps, flags);
+  my_fluid_sim = create_fluid_sim(0, "../src/fluid_kernel.cl", sim_size, 0.00001f, 0.00001f, num_r_steps, flags);
 
 #ifdef __APPLE__
   struct timespec start, end;
