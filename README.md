@@ -1,6 +1,5 @@
 # OpenCLFluid
-An efficient, yet powerful, interactive fluid simulation using OpenCL.
-http://www.intpowertechcorp.com/GDC03.pdf
+An efficient, yet powerful, interactive fluid simulation using OpenCL. The white paper can be found [here](http://www.dgp.toronto.edu/people/stam/reality/Research/pdf/GDC03.pdf).
 
 Make sure you have SDL2, OpenGL, and OpenCL installed to run.
 
